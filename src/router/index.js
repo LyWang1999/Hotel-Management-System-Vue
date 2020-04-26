@@ -156,26 +156,26 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-  // 学生路由
+  // 管理员路由
   {
-    path: '/table_information',
+    path: '/admin/people_info',
     component: Layout,
-    name: 'table_information',
+    name: 'people_infos',
     redirect: 'noRedirect',
-    meta: { title: '表格信息', icon: 'table', roles: ['student'] },
+    meta: { title: '人员信息', icon: 'peoples', roles: ['admin'] },
     children: [
       {
-        path: 'personal_profile',
-        name: 'personal_profile',
-        component: () => import('@/views/hotel_waiter/personal_profile/index'),
-        meta: { title: '个人简介表', icon: 'form' }
-      },
-      {
-        path: 'undergraduate_information',
-        name: 'undergraduate_information',
-        component: () => import('@/views/hotel_waiter/undergraduate_information/index'),
-        meta: { title: '本科导师选择表', icon: 'form' }
+        path: 'waiter_info',
+        name: 'waiter_info',
+        component: () => import('@/views/hotel-admin/waiter-info'),
+        meta: { title: '服务员信息', icon: 'table' }
       }
+      // {
+      //   path: 'undergraduate_information',
+      //   name: 'undergraduate_information',
+      //   component: () => import('@/views/hotel_waiter/undergraduate_information/index'),
+      //   meta: { title: '本科导师选择表', icon: 'form' }
+      // }
     ]
   }
 ]

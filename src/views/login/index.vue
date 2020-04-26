@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">导师双向选择系统</h3>
+        <h3 class="title">酒店后台管理系统</h3>
       </div>
 
       <el-form-item prop="username">
@@ -13,7 +13,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="请输入学号"
+          placeholder="请输入工号"
           name="username"
           type="text"
           tabindex="1"
@@ -47,8 +47,7 @@
 
       <div>
         <el-radio-group v-model="role" size="medium" style="margin-bottom: 20px;">
-          <el-radio-button label="学生" />
-          <el-radio-button label="教师" />
+          <el-radio-button label="服务员" />
           <el-radio-button label="管理员" />
         </el-radio-group>
       </div>
@@ -93,7 +92,7 @@ export default {
       showDialog: false,
       redirect: undefined,
       otherQuery: {},
-      role: '学生'
+      role: '服务员'
     }
   },
   watch: {
@@ -141,12 +140,10 @@ export default {
       })
     },
     handleLogin() {
-      if (this.role === '学生') {
-        this.loginForm.url = '/account/studentLogin'
-      } else if (this.role === '教师') {
-        this.loginForm.url = '/account/teacherLogin'
-      } else {
-        this.loginForm.url = '/account/adminLogin'
+      if (this.role === '服务员') {
+        this.loginForm.url = '/login/waiter'
+      } else if (this.role === '管理员') {
+        this.loginForm.url = '/login/admin'
       }
       this.$refs.loginForm.validate(valid => {
         if (valid) {

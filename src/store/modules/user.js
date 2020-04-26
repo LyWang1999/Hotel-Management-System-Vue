@@ -29,12 +29,17 @@ const mutations = {
 }
 
 const actions = {
-  // user login
+  // waiter or admin login
   login({ commit }, userInfo) {
     const { username, password, url } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password, url: url }).then(response => {
-        const { data } = response
+      login({ username, password, url }).then(response => {
+        const { data, msg } = response
+
+        if (!data) {
+          reject(msg)
+        }
+
         commit('SET_TOKEN', data.token)
         commit('SET_ID', data.id)
         setToken(data.token)
@@ -45,14 +50,13 @@ const actions = {
     })
   },
 
-  // get user info
+  // get waiter or admin info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       const roles = state.token.split('-', 1)
-      const rolesString = roles.toString()
 
       getInfo({
-        url: '/' + roles + '/getOne' + rolesString.replace(rolesString[0], rolesString[0].toUpperCase()) + 'ById',
+        url: '/' + roles.toString() + '/info',
         id: state.id
       }).then(response => {
         const { data } = response
@@ -61,8 +65,13 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
+        const { waiterName, adminName } = data
         commit('SET_ROLES', roles)
-        commit('SET_NAME', data.name)
+        if (roles.toString() === 'waiter') {
+          commit('SET_NAME', waiterName)
+        } else {
+          commit('SET_NAME', adminName)
+        }
         commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
         resolve({ roles })
       }).catch(error => {
