@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getWaiters(listQuery) {
   return request({
-    url: '/waiter/Info/page/' + listQuery.page + '/limit/' + listQuery.limit + '/asc/' + listQuery.asc,
+    url: '/waiter/info/page/' + listQuery.page + '/limit/' + listQuery.limit + '/asc/' + listQuery.asc,
     method: 'get',
     params: {
       waiterNo: listQuery.waiterNo,

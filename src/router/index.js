@@ -169,13 +169,13 @@ export const asyncRoutes = [
         name: 'waiter_info',
         component: () => import('@/views/hotel-admin/waiter-info'),
         meta: { title: '服务员信息', icon: 'table' }
+      },
+      {
+        path: 'admin_info',
+        name: 'admin_info',
+        component: () => import('@/views/hotel-admin/admin-info'),
+        meta: { title: '管理员信息', icon: 'table' }
       }
-      // {
-      //   path: 'undergraduate_information',
-      //   name: 'undergraduate_information',
-      //   component: () => import('@/views/hotel_waiter/undergraduate_information/index'),
-      //   meta: { title: '本科导师选择表', icon: 'form' }
-      // }
     ]
   }
 ]

@@ -113,7 +113,7 @@
       @pagination="fetchData"
     />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="35%">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="37%">
       <el-form
         ref="dataForm"
         :rules="rules"
