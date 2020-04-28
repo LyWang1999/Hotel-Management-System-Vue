@@ -59,7 +59,7 @@
       </el-table-column>
       <el-table-column prop="adminPassword" align="center" label="密码" width="150" />
       <el-table-column prop="adminDuty" label="工作职责" align="center" width="550" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center">
         <template slot-scope="{row}">
           <el-button v-waves type="primary" size="mini" @click="handleCheck(row)">
             查看

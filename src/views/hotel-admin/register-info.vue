@@ -2,45 +2,15 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
-        v-model="listQuery.waiterNo"
-        placeholder="工号"
+        v-model="listQuery.registerPhone"
+        placeholder="手机号"
         style="width: 150px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-input
-        v-model="listQuery.waiterName"
-        placeholder="姓名"
-        style="width: 150px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-time-select
-        v-model="listQuery.beginWorkTime"
-        placeholder="上班时间"
-        :picker-options="{
-          start: '06:00',
-          step: '00:30',
-          end: '24:00'
-        }"
-        style="width: 150px;"
-        class="filter-item"
-      />
-      <el-time-select
-        v-model="listQuery.endWorkTime"
-        placeholder="下班时间"
-        :picker-options="{
-          start: '06:00',
-          step: '00:30',
-          end: '24:00',
-          minTime: listQuery.beginWorkTime
-        }"
-        style="width: 150px;"
-        class="filter-item"
-      />
-      <el-input
-        v-model="listQuery.workDay"
-        placeholder="工作日"
+        v-model="listQuery.registerAccount"
+        placeholder="账号名"
         style="width: 150px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
@@ -71,9 +41,19 @@
       >
         导出
       </el-button>
+      <el-checkbox v-model="showMemberDetail" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
+        会员等级
+      </el-checkbox>
+      <el-checkbox v-model="showMemberScore" class="filter-item" @change="tableKey=tableKey+1">
+        会员积分
+      </el-checkbox>
+      <el-checkbox v-model="showMemberDiscount" class="filter-item" @change="tableKey=tableKey+1">
+        会员折扣
+      </el-checkbox>
     </div>
 
     <el-table
+      :key="tableKey"
       v-loading="listLoading"
       :data="tableData"
       fit
@@ -81,19 +61,20 @@
       highlight-current-row
       @sort-change="sortChange"
     >
-      <el-table-column prop="waiterId" label="序号" align="center" sortable="custom" width="90" />
-      <el-table-column prop="waiterNo" label="工号" align="center" width="150" />
-      <el-table-column prop="waiterName" label="姓名" align="center" width="100" />
+      <el-table-column prop="registerId" label="序号" align="center" sortable="custom" width="90" />
+      <el-table-column prop="registerPhone" label="手机号" align="center" width="150" />
+      <el-table-column prop="registerAccount" label="账号名" align="center" width="100" />
       <el-table-column align="center" label="性别" width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.male === 1 ? '男' : '女' }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="waiterPassword" align="center" label="密码" width="150" />
-      <el-table-column prop="beginWorkTime" label="上班时间" align="center" width="150" />
-      <el-table-column prop="endWorkTime" label="下班时间" align="center" width="150" />
-      <el-table-column prop="workDay" label="工作日" align="center" width="200" />
-      <el-table-column label="操作" align="center">
+      <el-table-column prop="registerPassword" align="center" label="密码" width="150" />
+      <el-table-column prop="registerEmail" label="邮箱" align="center" />
+      <el-table-column v-if="showMemberDetail" prop="memberDetail" label="会员等级" align="center" width="100" />
+      <el-table-column v-if="showMemberScore" prop="memberScore" label="会员积分" align="center" width="80" />
+      <el-table-column v-if="showMemberDiscount" prop="memberDiscount" label="会员折扣" align="center" width="80" />
+      <el-table-column label="操作" align="center" width="180">
         <template slot-scope="{row}">
           <el-button v-waves type="primary" size="mini" @click="handleUpdate(row)">
             编辑
@@ -108,7 +89,7 @@
             title="确定删除吗?"
             @onConfirm="deleteData(row)"
           >
-            <el-button slot="reference" type="danger" size="mini">删除</el-button>
+            <el-button slot="reference" v-waves type="danger" size="mini">删除</el-button>
           </el-popconfirm>
         </template>
       </el-table-column>
@@ -132,13 +113,13 @@
         style="width: 400px; margin-left:50px;"
       >
         <el-form-item v-show="dialogStatus==='update'" label="序号">
-          <el-input :value="temp.waiterId" :disabled="true" />
+          <el-input :value="temp.registerId" :disabled="true" />
         </el-form-item>
-        <el-form-item label="工号" prop="waiterNo">
-          <el-input v-model="temp.waiterNo" :disabled="dialogStatus!=='create'" />
+        <el-form-item label="手机号" prop="registerPhone">
+          <el-input v-model="temp.registerPhone" />
         </el-form-item>
-        <el-form-item label="姓名" prop="waiterName">
-          <el-input v-model="temp.waiterName" />
+        <el-form-item label="账号名" prop="registerAccount">
+          <el-input v-model="temp.registerAccount" />
         </el-form-item>
         <el-form-item label="性别" required>
           <el-radio-group v-model="temp.male">
@@ -146,43 +127,14 @@
             <el-radio :label="0">女</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="密码" prop="waiterPassword">
-          <el-input v-model="temp.waiterPassword" />
+        <el-form-item label="密码" prop="registerPassword">
+          <el-input v-model="temp.registerPassword" />
         </el-form-item>
-        <el-form-item label="工作时间" required>
-          <el-col :span="12">
-            <el-form-item prop="beginWorkTime">
-              <el-time-select
-                v-model="temp.beginWorkTime"
-                placeholder="上班时间"
-                :picker-options="{
-                  start: '06:00',
-                  step: '00:30',
-                  end: '24:00'
-                }"
-                style="width: 95%;"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="1">-</el-col>
-          <el-col :span="11">
-            <el-form-item prop="endWorkTime">
-              <el-time-select
-                v-model="temp.endWorkTime"
-                placeholder="下班时间"
-                :picker-options="{
-                  start: '06:00',
-                  step: '00:30',
-                  end: '24:00',
-                  minTime: temp.beginWorkTime
-                }"
-                style="width: 100%;"
-              />
-            </el-form-item>
-          </el-col>
+        <el-form-item label="邮箱" prop="registerEmail">
+          <el-input v-model="temp.registerEmail" />
         </el-form-item>
-        <el-form-item label="工作日" prop="workDay">
-          <el-input v-model="temp.workDay" />
+        <el-form-item v-show="dialogStatus!=='create'" label="会员积分" prop="memberScore">
+          <el-input v-model="temp.memberScore" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -198,7 +150,7 @@
 </template>
 
 <script>
-import { getWaiters, createWaiterInfo, updateWaiterInfo, deleteWaiterInfo } from '@/api/hotel-admin/waiter-info'
+import { getRegisters, updateRegisterInfo, deleteRegisterInfo, createRegisterInfo } from '@/api/hotel-admin/register-info'
 import Pagination from '@/components/Pagination/index'
 import waves from '@/directive/waves'
 
@@ -207,28 +159,30 @@ export default {
   directives: { waves },
   data() {
     return {
+      tableKey: 0,
+      showMemberDetail: true,
+      showMemberScore: true,
+      showMemberDiscount: true,
       listLoading: true,
       total: 0,
       listQuery: {
         page: 1,
         limit: 10,
         asc: true,
-        waiterNo: '',
-        waiterName: '',
-        beginWorkTime: '',
-        endWorkTime: '',
-        workDay: ''
+        registerPhone: '',
+        registerAccount: ''
       },
       tableData: [],
       temp: {
-        waiterId: 1,
-        waiterNo: '',
-        waiterName: '',
+        registerId: 1,
+        registerPhone: '',
+        registerAccount: '',
+        registerPassword: '123456',
         male: 1,
-        waiterPassword: '123456',
-        beginWorkTime: '06:00',
-        endWorkTime: '21:00',
-        workDay: '周一/周二/周三/周四/周五/周六/周日'
+        registerEmail: '',
+        memberDetail: '',
+        memberScore: 0,
+        memberDiscount: 1.00
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -237,25 +191,24 @@ export default {
         create: '创建'
       },
       rules: {
-        waiterNo: [
-          { required: true, message: '请填写工号', trigger: 'blur' },
-          { min: 8, max: 8, message: '工号为8位', trigger: ['change', 'blur'] }
+        registerPhone: [
+          { required: true, message: '请填写手机号', trigger: 'blur' },
+          { required: true, pattern: /^1[345678]\d{9}$/, message: '手机号格式有误', trigger: ['change', 'blur'] }
         ],
-        waiterName: [
-          { required: true, message: '请填写姓名', trigger: 'blur' }
+        registerAccount: [
+          { required: true, message: '请填写账号名', trigger: 'blur' }
         ],
-        waiterPassword: [
+        registerPassword: [
           { required: true, message: '请填写密码', trigger: 'blur' },
           { required: true, min: 6, message: '密码至少为6位', trigger: ['change', 'blur'] }
         ],
-        beginWorkTime: [
-          { required: true, message: '请指定上班时间', trigger: 'blur' }
+        registerEmail: [
+          { required: true, message: '请填写邮箱', trigger: 'blur' },
+          { required: true, type: 'email', message: '邮箱格式有误', trigger: ['change', 'blur'] }
         ],
-        endWorkTime: [
-          { required: true, message: '请指定下班时间', trigger: 'blur' }
-        ],
-        workDay: [
-          { required: true, message: '请填写工作日', trigger: 'blur' }
+        memberScore: [
+          { required: true, message: '请填写会员积分', trigger: 'blur' },
+          { required: true, pattern: /^[0-9]\d{0,3}$/, message: '请填写0 - 9999整数数值', trigger: ['change', 'blur'] }
         ]
       },
       downloadLoading: false
@@ -267,7 +220,7 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      getWaiters(this.listQuery).then(response => {
+      getRegisters(this.listQuery).then(response => {
         this.tableData = response.data.items
         this.total = response.data.total
         this.listLoading = false
@@ -275,7 +228,7 @@ export default {
     },
     sortChange(data) {
       const { prop, order } = data
-      if (prop === 'waiterId') {
+      if (prop === 'registerId') {
         this.sortByID(order)
       }
     },
@@ -289,14 +242,15 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        waiterId: 1,
-        waiterNo: '',
-        waiterName: '',
+        registerId: 1,
+        registerPhone: '',
+        registerAccount: '',
+        registerPassword: '123456',
         male: 1,
-        waiterPassword: '123456',
-        beginWorkTime: '06:00',
-        endWorkTime: '21:00',
-        workDay: '周一/周二/周三/周四/周五/周六/周日'
+        registerEmail: '',
+        memberDetail: '',
+        memberScore: 0,
+        memberDiscount: 1.0
       }
     },
     handleCreate() {
@@ -321,9 +275,10 @@ export default {
           this.dialogFormVisible = false
           return new Promise((resolve, reject) => {
             const tempData = Object.assign({}, this.temp)
-            createWaiterInfo(tempData).then(response => {
+            createRegisterInfo(tempData).then(response => {
               const { data } = response
               if (data === true) {
+                this.memberInfoComplete()
                 this.tableData.unshift(this.temp)
                 this.$notify({
                   title: '成功',
@@ -337,7 +292,7 @@ export default {
                   message: '创建失败',
                   type: 'error'
                 })
-                reject('create waiter info failed')
+                reject('create register info failed')
               }
             }).catch(error => {
               reject(error)
@@ -352,11 +307,12 @@ export default {
           this.dialogFormVisible = false
           return new Promise((resolve, reject) => {
             const tempData = Object.assign({}, this.temp)
-            updateWaiterInfo(tempData).then(response => {
+            updateRegisterInfo(tempData).then(response => {
               const { data } = response
               if (data === true) {
+                this.memberInfoComplete()
                 for (const v of this.tableData) {
-                  if (v.waiterId === this.temp.waiterId) {
+                  if (v.registerId === this.temp.registerId) {
                     const index = this.tableData.indexOf(v)
                     this.tableData.splice(index, 1, this.temp)
                     break
@@ -374,7 +330,7 @@ export default {
                   message: '更新失败',
                   type: 'error'
                 })
-                reject('update waiter info failed')
+                reject('update register info failed')
               }
             }).catch(error => {
               reject(error)
@@ -386,12 +342,12 @@ export default {
     deleteData(row) {
       this.temp = Object.assign({}, row)
       return new Promise((resolve, reject) => {
-        const { waiterId } = this.temp
-        deleteWaiterInfo(waiterId).then(response => {
+        const { registerId } = this.temp
+        deleteRegisterInfo(registerId).then(response => {
           const { data } = response
           if (data === true) {
             for (const v of this.tableData) {
-              if (v.waiterId === waiterId) {
+              if (v.registerId === registerId) {
                 const index = this.tableData.indexOf(v)
                 this.tableData.splice(index, 1)
                 break
@@ -410,7 +366,7 @@ export default {
               message: '删除失败',
               type: 'error'
             })
-            reject('delete waiter info failed')
+            reject('delete register info failed')
           }
         }).catch(error => {
           reject(error)
@@ -420,13 +376,13 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['序号', '工号', '姓名', '性别', '密码', '上班时间', '下班时间', '工作日']
-          const filterVal = ['waiterId', 'waiterNo', 'waiterName', 'male', 'waiterPassword', 'beginWorkTime', 'endWorkTime', 'workDay']
+          const tHeader = ['序号', '手机号', '账号名', '性别', '密码', '邮箱', '会员等级', '会员积分', '会员折扣']
+          const filterVal = ['registerId', 'registerPhone', 'registerAccount', 'male', 'registerPassword', 'registerEmail', 'memberDetail', 'memberScore', 'memberDiscount']
           const data = this.formatJson(filterVal, this.tableData)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: 'waiter-list'
+            filename: 'register-list'
           })
           this.downloadLoading = false
         })
@@ -439,6 +395,21 @@ export default {
           return v[j]
         }
       }))
+    },
+    memberInfoComplete() {
+      if (this.temp.memberScore < 1000) {
+        this.temp.memberDiscount = 1.0
+        this.temp.memberDetail = '普通会员'
+      } else if (this.temp.memberScore < 3000) {
+        this.temp.memberDiscount = 0.95
+        this.temp.memberDetail = '银卡会员'
+      } else if (this.temp.memberScore < 6000) {
+        this.temp.memberDiscount = 0.85
+        this.temp.memberDetail = '金卡会员'
+      } else {
+        this.temp.memberDiscount = 0.75
+        this.temp.memberDetail = '铂金会员'
+      }
     }
   }
 }

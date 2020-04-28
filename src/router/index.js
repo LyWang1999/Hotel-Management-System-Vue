@@ -175,6 +175,12 @@ export const asyncRoutes = [
         name: 'admin_info',
         component: () => import('@/views/hotel-admin/admin-info'),
         meta: { title: '管理员信息', icon: 'table' }
+      },
+      {
+        path: 'register_info',
+        name: 'register_info',
+        component: () => import('@/views/hotel-admin/register-info'),
+        meta: { title: '注册会员信息', icon: 'table' }
       }
     ]
   }
