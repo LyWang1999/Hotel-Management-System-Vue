@@ -71,7 +71,17 @@
       </el-table-column>
       <el-table-column prop="registerPassword" align="center" label="密码" width="150" />
       <el-table-column prop="registerEmail" label="邮箱" align="center" />
-      <el-table-column v-if="showMemberDetail" prop="memberDetail" label="会员等级" align="center" width="100" />
+      <el-table-column v-if="showMemberDetail" label="会员等级" align="center" width="150">
+        <template slot-scope="scope">
+          <el-rate
+            :value="showStar(scope.row.memberDetail)"
+            :title="scope.row.memberDetail"
+            :max="4"
+            disabled
+            :colors="starColors"
+          />
+        </template>
+      </el-table-column>
       <el-table-column v-if="showMemberScore" prop="memberScore" label="会员积分" align="center" width="80" />
       <el-table-column v-if="showMemberDiscount" prop="memberDiscount" label="会员折扣" align="center" width="80" />
       <el-table-column label="操作" align="center" width="180">
@@ -163,6 +173,11 @@ export default {
       showMemberDetail: true,
       showMemberScore: true,
       showMemberDiscount: true,
+      starColors: {
+        1: '#99A9BF',
+        3: '#f7ba2a',
+        4: '#ff7b00'
+      },
       listLoading: true,
       total: 0,
       listQuery: {
@@ -192,23 +207,23 @@ export default {
       },
       rules: {
         registerPhone: [
-          { required: true, message: '请填写手机号', trigger: 'blur' },
-          { required: true, pattern: /^1[345678]\d{9}$/, message: '手机号格式有误', trigger: ['change', 'blur'] }
+          { required: true, message: '请填写手机号', trigger: 'change' },
+          { required: true, pattern: /^1[345678]\d{9}$/, message: '手机号格式有误', trigger: 'change' }
         ],
         registerAccount: [
-          { required: true, message: '请填写账号名', trigger: 'blur' }
+          { required: true, message: '请填写账号名', trigger: 'change' }
         ],
         registerPassword: [
-          { required: true, message: '请填写密码', trigger: 'blur' },
-          { required: true, min: 6, message: '密码至少为6位', trigger: ['change', 'blur'] }
+          { required: true, message: '请填写密码', trigger: 'change' },
+          { required: true, min: 6, message: '密码至少为6位', trigger: 'change' }
         ],
         registerEmail: [
-          { required: true, message: '请填写邮箱', trigger: 'blur' },
-          { required: true, type: 'email', message: '邮箱格式有误', trigger: ['change', 'blur'] }
+          { required: true, message: '请填写邮箱', trigger: 'change' },
+          { required: true, type: 'email', message: '邮箱格式有误', trigger: 'change' }
         ],
         memberScore: [
-          { required: true, message: '请填写会员积分', trigger: 'blur' },
-          { required: true, pattern: /^[0-9]\d{0,3}$/, message: '请填写0 - 9999整数数值', trigger: ['change', 'blur'] }
+          { required: true, message: '请填写会员积分', trigger: 'change' },
+          { required: true, pattern: /^[0-9]\d{0,3}$/, message: '请填写0 - 9999整数数值', trigger: 'change' }
         ]
       },
       downloadLoading: false
@@ -218,6 +233,17 @@ export default {
     this.fetchData()
   },
   methods: {
+    showStar(memberDetail) {
+      if (memberDetail === '普通会员') {
+        return 1
+      } else if (memberDetail === '银卡会员') {
+        return 2
+      } else if (memberDetail === '金卡会员') {
+        return 3
+      } else if (memberDetail === '铂金会员') {
+        return 4
+      }
+    },
     fetchData() {
       this.listLoading = true
       getRegisters(this.listQuery).then(response => {

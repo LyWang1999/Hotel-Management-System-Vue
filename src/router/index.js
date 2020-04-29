@@ -165,22 +165,28 @@ export const asyncRoutes = [
     meta: { title: '人员信息', icon: 'peoples', roles: ['admin'] },
     children: [
       {
-        path: 'waiter_info',
-        name: 'waiter_info',
-        component: () => import('@/views/hotel-admin/waiter-info'),
-        meta: { title: '服务员信息', icon: 'table' }
-      },
-      {
-        path: 'admin_info',
-        name: 'admin_info',
-        component: () => import('@/views/hotel-admin/admin-info'),
-        meta: { title: '管理员信息', icon: 'table' }
+        path: 'check_customer_info',
+        name: 'check_customer_info',
+        component: () => import('@/views/hotel-admin/check-customer-info'),
+        meta: { title: '入住顾客信息' }
       },
       {
         path: 'register_info',
         name: 'register_info',
         component: () => import('@/views/hotel-admin/register-info'),
-        meta: { title: '注册会员信息', icon: 'table' }
+        meta: { title: '注册会员信息' }
+      },
+      {
+        path: 'waiter_info',
+        name: 'waiter_info',
+        component: () => import('@/views/hotel-admin/waiter-info'),
+        meta: { title: '服务员信息' }
+      },
+      {
+        path: 'admin_info',
+        name: 'admin_info',
+        component: () => import('@/views/hotel-admin/admin-info'),
+        meta: { title: '管理员信息' }
       }
     ]
   }

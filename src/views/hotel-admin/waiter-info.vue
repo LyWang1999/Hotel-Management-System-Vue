@@ -90,8 +90,18 @@
         </template>
       </el-table-column>
       <el-table-column prop="waiterPassword" align="center" label="密码" width="150" />
-      <el-table-column prop="beginWorkTime" label="上班时间" align="center" width="150" />
-      <el-table-column prop="endWorkTime" label="下班时间" align="center" width="150" />
+      <el-table-column label="上班时间" align="center" width="150">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span style="margin-left: 10px">{{ scope.row.beginWorkTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="下班时间" align="center" width="150">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span style="margin-left: 10px">{{ scope.row.endWorkTime }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="workDay" label="工作日" align="center" width="200" />
       <el-table-column label="操作" align="center">
         <template slot-scope="{row}">
@@ -238,24 +248,24 @@ export default {
       },
       rules: {
         waiterNo: [
-          { required: true, message: '请填写工号', trigger: 'blur' },
-          { min: 8, max: 8, message: '工号为8位', trigger: ['change', 'blur'] }
+          { required: true, message: '请填写工号', trigger: 'change' },
+          { min: 8, max: 8, message: '工号为8位', trigger: 'change' }
         ],
         waiterName: [
-          { required: true, message: '请填写姓名', trigger: 'blur' }
+          { required: true, message: '请填写姓名', trigger: 'change' }
         ],
         waiterPassword: [
-          { required: true, message: '请填写密码', trigger: 'blur' },
-          { required: true, min: 6, message: '密码至少为6位', trigger: ['change', 'blur'] }
+          { required: true, message: '请填写密码', trigger: 'change' },
+          { required: true, min: 6, message: '密码至少为6位', trigger: 'change' }
         ],
         beginWorkTime: [
-          { required: true, message: '请指定上班时间', trigger: 'blur' }
+          { required: true, message: '请指定上班时间', trigger: 'change' }
         ],
         endWorkTime: [
-          { required: true, message: '请指定下班时间', trigger: 'blur' }
+          { required: true, message: '请指定下班时间', trigger: 'change' }
         ],
         workDay: [
-          { required: true, message: '请填写工作日', trigger: 'blur' }
+          { required: true, message: '请填写工作日', trigger: 'change' }
         ]
       },
       downloadLoading: false
