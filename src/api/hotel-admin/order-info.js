@@ -1,5 +1,19 @@
 import request from '@/utils/request'
 
+export function getOrders(listQuery) {
+  return request({
+    url: '/order/info/page/' + listQuery.page + '/limit/' + listQuery.limit + '/asc/' + listQuery.asc,
+    method: 'get',
+    params: {
+      orderId: listQuery.orderId,
+      registerPhone: listQuery.registerPhone,
+      roomTypeName: listQuery.roomTypeName,
+      beginDate: listQuery.beginDate,
+      endDate: listQuery.endDate
+    }
+  })
+}
+
 export function getOneOrderById(orderId) {
   return request({
     url: '/order/info/id/' + orderId,
@@ -7,32 +21,28 @@ export function getOneOrderById(orderId) {
   })
 }
 
-// export function updateCheckCustomerInfo({ checkCustomerIdCard, checkCustomerId, checkCustomerName,
-//   male, waiterPassword, orderId, roomNo, checkCustomerCheckInTime, checkCustomerLeaveTime, living }) {
-//   return request({
-//     url: '/check-customer/info',
-//     method: 'patch',
-//     data: {
-//       checkCustomerIdCard,
-//       checkCustomerId,
-//       checkCustomerName,
-//       male,
-//       waiterPassword,
-//       orderId,
-//       roomNo,
-//       checkCustomerCheckInTime,
-//       checkCustomerLeaveTime,
-//       living
-//     }
-//   })
-// }
-//
-// export function deleteCheckCustomerInfo(checkCustomerId) {
-//   return request({
-//     url: '/check-customer/info',
-//     method: 'delete',
-//     data: {
-//       checkCustomerId
-//     }
-//   })
-// }
+export function updateOrderInfo({ orderId, roomTypeName, orderCheckInTime, orderLeaveTime, orderRoomNum, orderDetail, complete }) {
+  return request({
+    url: '/order/info',
+    method: 'patch',
+    data: {
+      orderId,
+      roomTypeName,
+      orderCheckInTime,
+      orderLeaveTime,
+      orderRoomNum,
+      orderDetail,
+      complete
+    }
+  })
+}
+
+export function deleteOrderInfo(orderId) {
+  return request({
+    url: '/order/info',
+    method: 'delete',
+    data: {
+      orderId
+    }
+  })
+}

@@ -44,28 +44,6 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
     path: '/form',
     component: Layout,
     children: [
@@ -187,6 +165,21 @@ export const asyncRoutes = [
         name: 'admin_info',
         component: () => import('@/views/hotel-admin/admin-info'),
         meta: { title: '管理员信息' }
+      }
+    ]
+  },
+  {
+    path: '/admin/property_info',
+    component: Layout,
+    name: 'property_infos',
+    redirect: 'noRedirect',
+    meta: { title: '物业信息', icon: 'finance', roles: ['admin'] },
+    children: [
+      {
+        path: 'check_customer_info',
+        name: 'check_customer_info',
+        component: () => import('@/views/hotel-admin/order-info'),
+        meta: { title: '订单信息' }
       }
     ]
   }

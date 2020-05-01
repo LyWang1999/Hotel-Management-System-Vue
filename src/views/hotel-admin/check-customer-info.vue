@@ -125,14 +125,15 @@
       @pagination="fetchData"
     />
 
-    <el-dialog title="编辑" :visible.sync="checkCustomerFormVisible" width="37%">
+    <el-dialog title="编辑" :visible.sync="checkCustomerFormVisible" width="47%">
       <el-form
         ref="dataForm"
+        :inline="true"
         :rules="rules"
         :model="temp"
         label-position="right"
         label-width="80px"
-        style="width: 400px; margin-left:50px;"
+        style="width: 600px; margin-left:50px;"
       >
         <el-form-item label="序号">
           <el-input :value="temp.checkCustomerId" :disabled="true" />
@@ -143,14 +144,20 @@
         <el-form-item label="姓名" prop="checkCustomerName">
           <el-input v-model="temp.checkCustomerName" />
         </el-form-item>
+        <el-form-item label="手机号" prop="checkCustomerPhone">
+          <el-input v-model="temp.checkCustomerPhone" />
+        </el-form-item>
         <el-form-item label="性别" required>
           <el-radio-group v-model="temp.male">
             <el-radio :label="1">男</el-radio>
-            <el-radio :label="0">女</el-radio>
+            <el-radio :label="0" style="margin-right: 85px">女</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="手机号" prop="checkCustomerPhone">
-          <el-input v-model="temp.checkCustomerPhone" />
+        <el-form-item label="居住状态" prop="living" required>
+          <el-radio-group v-model="temp.living">
+            <el-radio :label="1">居住</el-radio>
+            <el-radio :label="0">离开</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="订单号" prop="orderId">
           <el-input v-model="temp.orderId" />
@@ -165,13 +172,8 @@
             start-placeholder="入住时间"
             end-placeholder="离开时间"
             value-format="yyyy-MM-dd HH:mm:ss"
+            style="width: 119%"
           />
-        </el-form-item>
-        <el-form-item label="居住状态" prop="living" required>
-          <el-radio-group v-model="temp.living">
-            <el-radio :label="1">居住</el-radio>
-            <el-radio :label="0">离开</el-radio>
-          </el-radio-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -184,11 +186,12 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="订单信息" :visible.sync="orderFormVisible" width="37%">
+    <el-dialog title="订单信息" :visible.sync="orderFormVisible" width="49%">
       <el-form
+        :inline="true"
         label-position="right"
         label-width="100px"
-        style="width: 400px; margin-left:50px;"
+        style="width: 650px; margin-left:50px;"
       >
         <el-form-item label="订单号">
           <el-input :value="orderData.orderId" readonly />
@@ -323,7 +326,7 @@ export default {
         message: '点击订单号可查看订单详细信息',
         center: true
       })
-    }, 1500)
+    }, 1000)
   },
   methods: {
     fetchData() {

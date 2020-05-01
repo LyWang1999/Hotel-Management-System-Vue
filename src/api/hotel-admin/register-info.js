@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getOneRegisterByPhone(registerPhone) {
+  return request({
+    url: '/register/info/register-phone/' + registerPhone,
+    method: 'get'
+  })
+}
+
 export function getRegisters(listQuery) {
   return request({
     url: '/register/info/page/' + listQuery.page + '/limit/' + listQuery.limit + '/asc/' + listQuery.asc,
