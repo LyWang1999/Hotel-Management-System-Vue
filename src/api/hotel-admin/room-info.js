@@ -1,9 +1,19 @@
 import request from '@/utils/request'
 
-export function getRoomNumByType() {
+export function getEmptyRoomNumByAllTypes() {
   return request({
-    url: '/room/empty-num',
+    url: '/room/empty/num',
     method: 'get'
+  })
+}
+
+export function getEmptyRoomsByType(roomTypeName) {
+  return request({
+    url: '/room/empty/type',
+    method: 'get',
+    params: {
+      roomTypeName
+    }
   })
 }
 

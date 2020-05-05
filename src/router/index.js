@@ -116,6 +116,12 @@ export const asyncRoutes = [
         name: 'room_info',
         component: () => import('@/views/hotel-admin/room-info'),
         meta: { title: '房间信息' }
+      },
+      {
+        path: 'room_type_info',
+        name: 'room_type_info',
+        component: () => import('@/views/hotel-admin/room-type-info'),
+        meta: { title: '房型信息' }
       }
     ]
   }

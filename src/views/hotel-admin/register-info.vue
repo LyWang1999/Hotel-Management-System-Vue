@@ -143,7 +143,7 @@
         <el-form-item label="邮箱" prop="registerEmail">
           <el-input v-model="temp.registerEmail" />
         </el-form-item>
-        <el-form-item v-show="dialogStatus!=='create'" label="会员积分" prop="memberScore">
+        <el-form-item v-if="dialogStatus!=='create'" label="会员积分" prop="memberScore">
           <el-input v-model="temp.memberScore" />
         </el-form-item>
       </el-form>

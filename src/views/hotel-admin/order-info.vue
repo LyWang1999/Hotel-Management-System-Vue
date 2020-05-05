@@ -221,7 +221,7 @@
 <script>
 import { getOneRegisterByPhone } from '@/api/hotel-admin/register-info'
 import { getOrders, updateOrderInfo, deleteOrderInfo } from '@/api/hotel-admin/order-info'
-import { getRoomNumByType } from '@/api/hotel-admin/room-info'
+import { getEmptyRoomNumByAllTypes } from '@/api/hotel-admin/room-info'
 import Pagination from '@/components/Pagination/index'
 import waves from '@/directive/waves'
 
@@ -362,7 +362,7 @@ export default {
       }
     },
     handleUpdate(row) {
-      getRoomNumByType().then((response) => {
+      getEmptyRoomNumByAllTypes().then((response) => {
         this.options = response.data
       })
       this.temp = Object.assign({}, row) // copy obj
