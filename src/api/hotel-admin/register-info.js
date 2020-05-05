@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getOneRegisterByPhone(registerPhone) {
   return request({
-    url: '/register/info/register-phone/' + registerPhone,
+    url: '/register/info/phone/' + registerPhone,
     method: 'get'
   })
 }

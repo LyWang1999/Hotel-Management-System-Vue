@@ -441,6 +441,14 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+/deep/ .el-dialog{
+  display: flex;
+  flex-direction: column;
+  margin:0 !important;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
 </style>

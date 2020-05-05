@@ -141,12 +141,12 @@
         </el-form-item>
         <el-form-item label="房间类型" prop="roomTypeName" required>
           <el-select v-model="temp.roomTypeName" placeholder="请选择房型" style="width:56%">
-            <el-option v-for="item in options" :key="item.roomTypeName" :label="item.roomTypeName" :value="item.roomTypeName" />
+            <el-option v-for="(item, key) in options" :key="key" :label="item.roomTypeName" :value="item.roomTypeName" />
           </el-select>
         </el-form-item>
         <el-form-item label="房间数量" prop="orderRoomNum">
           <el-input-number v-model="temp.orderRoomNum" controls-position="right" :min="1" :max="selectMaxRoomNum" />
-          <el-button size="mini" icon="el-icon-refresh" @click="refreshMaxRoomNum" style="margin-left: 10px"></el-button>
+          <el-button size="mini" icon="el-icon-refresh" style="margin-left: 10px" @click="refreshMaxRoomNum" />
         </el-form-item>
         <el-form-item label="完成情况" required>
           <el-radio-group v-model="temp.complete">
@@ -165,7 +165,13 @@
           />
         </el-form-item>
         <el-form-item label="订单备注" prop="orderDetail">
-          <el-input v-model="temp.orderDetail" />
+          <el-input
+            v-model="temp.orderDetail"
+            type="textarea"
+            :rows="4"
+            maxlength="50"
+            show-word-limit
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -508,5 +514,14 @@ export default {
     border-right: 0;
     background-color: #fff;
   }
+}
+/deep/ .el-dialog{
+  display: flex;
+  flex-direction: column;
+  margin:0 !important;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
 }
 </style>

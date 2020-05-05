@@ -2,49 +2,34 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
-        v-model="listQuery.waiterNo"
-        placeholder="工号"
+        v-model="listQuery.roomNo"
+        placeholder="房间号"
         style="width: 150px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-input
-        v-model="listQuery.waiterName"
-        placeholder="姓名"
+        v-model="listQuery.roomTypeName"
+        placeholder="房间类型"
         style="width: 150px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-time-select
-        v-model="listQuery.beginWorkTime"
-        placeholder="上班时间"
-        :picker-options="{
-          start: '06:00',
-          step: '00:30',
-          end: '24:00'
-        }"
-        style="width: 150px;"
-        class="filter-item"
-      />
-      <el-time-select
-        v-model="listQuery.endWorkTime"
-        placeholder="下班时间"
-        :picker-options="{
-          start: '06:00',
-          step: '00:30',
-          end: '24:00',
-          minTime: listQuery.beginWorkTime
-        }"
-        style="width: 150px;"
-        class="filter-item"
-      />
-      <el-input
-        v-model="listQuery.workDay"
-        placeholder="工作日"
-        style="width: 150px;"
+      <el-select
+        v-model="listQuery.empty"
+        placeholder="房间状态"
+        clearable
+        style="width: 150px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
-      />
+      >
+        <el-option
+          v-for="(item, key) in roomStatus"
+          :key="key"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
       <el-button
         class="filter-item"
         type="primary"
@@ -81,29 +66,17 @@
       highlight-current-row
       @sort-change="sortChange"
     >
-      <el-table-column prop="waiterId" label="序号" align="center" sortable="custom" width="90" />
-      <el-table-column prop="waiterNo" label="工号" align="center" width="150" />
-      <el-table-column prop="waiterName" label="姓名" align="center" width="100" />
-      <el-table-column align="center" label="性别" width="100">
+      <el-table-column prop="roomId" label="序号" align="center" sortable="custom" width="90" />
+      <el-table-column prop="roomNo" label="房间号" align="center" width="100" />
+      <el-table-column prop="roomTypeName" label="房间类型" align="center" width="100" />
+      <el-table-column label="房间状态" align="center" width="100">
         <template slot-scope="scope">
-          <span>{{ scope.row.male === 1 ? '男' : '女' }}</span>
+          <el-tag v-if="scope.row.empty === 1">房间空余</el-tag>
+          <el-tag v-else type="info">房间入住</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="waiterPassword" align="center" label="密码" width="150" />
-      <el-table-column label="上班时间" align="center" width="150">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span style="margin-left: 10px">{{ scope.row.beginWorkTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="下班时间" align="center" width="150">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span style="margin-left: 10px">{{ scope.row.endWorkTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="workDay" label="工作日" align="center" width="200" />
-      <el-table-column label="操作" align="center">
+      <el-table-column prop="roomDetail" label="房间详情" align="center" />
+      <el-table-column label="操作" align="center" width="150">
         <template slot-scope="{row}">
           <el-button v-waves type="primary" size="mini" @click="handleUpdate(row)">
             编辑
@@ -141,58 +114,31 @@
         label-width="80px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item v-show="dialogStatus==='update'" label="序号">
-          <el-input :value="temp.waiterId" :disabled="true" />
+        <el-form-item v-show="dialogStatus==='update'" label="序号" style="width: 71%">
+          <el-input :value="temp.roomId" :disabled="true" />
         </el-form-item>
-        <el-form-item label="工号" prop="waiterNo">
-          <el-input v-model="temp.waiterNo" :disabled="dialogStatus!=='create'" />
+        <el-form-item label="房间号" prop="roomNo" style="width: 71%">
+          <el-input v-model="temp.roomNo" />
         </el-form-item>
-        <el-form-item label="姓名" prop="waiterName">
-          <el-input v-model="temp.waiterName" />
+        <el-form-item label="房间类型" prop="roomTypeName">
+          <el-select v-model="temp.roomTypeName">
+            <el-option v-for="(item, key) in roomTypeData" :key="key" :label="item" :value="item" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="性别" required>
-          <el-radio-group v-model="temp.male">
-            <el-radio :label="1">男</el-radio>
-            <el-radio :label="0">女</el-radio>
+        <el-form-item v-show="dialogStatus==='update'" label="房间状态" prop="empty" required>
+          <el-radio-group v-model="temp.empty">
+            <el-radio :label="1">房间空余</el-radio>
+            <el-radio :label="0">房间入住</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="密码" prop="waiterPassword">
-          <el-input v-model="temp.waiterPassword" />
-        </el-form-item>
-        <el-form-item label="工作时间" required>
-          <el-col :span="12">
-            <el-form-item prop="beginWorkTime">
-              <el-time-select
-                v-model="temp.beginWorkTime"
-                placeholder="上班时间"
-                :picker-options="{
-                  start: '06:00',
-                  step: '00:30',
-                  end: '24:00'
-                }"
-                style="width: 95%;"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="1">-</el-col>
-          <el-col :span="11">
-            <el-form-item prop="endWorkTime">
-              <el-time-select
-                v-model="temp.endWorkTime"
-                placeholder="下班时间"
-                :picker-options="{
-                  start: '06:00',
-                  step: '00:30',
-                  end: '24:00',
-                  minTime: temp.beginWorkTime
-                }"
-                style="width: 100%;"
-              />
-            </el-form-item>
-          </el-col>
-        </el-form-item>
-        <el-form-item label="工作日" prop="workDay">
-          <el-input v-model="temp.workDay" />
+        <el-form-item label="房间详情" prop="roomDetail">
+          <el-input
+            v-model="temp.roomDetail"
+            type="textarea"
+            :rows="4"
+            maxlength="50"
+            show-word-limit
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -208,7 +154,8 @@
 </template>
 
 <script>
-import { getWaiters, createWaiterInfo, updateWaiterInfo, deleteWaiterInfo } from '@/api/hotel-admin/waiter-info'
+import { getRooms, updateRoomInfo, createRoomInfo, deleteRoomInfo } from '@/api/hotel-admin/room-info'
+import { getTypes } from '@/api/hotel-admin/room-type-info'
 import Pagination from '@/components/Pagination/index'
 import waves from '@/directive/waves'
 
@@ -223,23 +170,29 @@ export default {
         page: 1,
         limit: 10,
         asc: true,
-        waiterNo: '',
-        waiterName: '',
-        beginWorkTime: '',
-        endWorkTime: '',
-        workDay: ''
+        roomNo: '',
+        roomTypeName: '',
+        empty: ''
       },
       tableData: [],
+      roomTypeData: [],
       temp: {
-        waiterId: 1,
-        waiterNo: '',
-        waiterName: '',
-        male: 1,
-        waiterPassword: '123456',
-        beginWorkTime: '06:00',
-        endWorkTime: '21:00',
-        workDay: '周一/周二/周三/周四/周五/周六/周日'
+        roomId: 1,
+        roomNo: '',
+        roomTypeName: '',
+        roomDetail: '',
+        empty: 1
       },
+      roomStatus: [
+        {
+          label: '房间空余',
+          value: 1
+        },
+        {
+          label: '房间入住',
+          value: 0
+        }
+      ],
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -247,25 +200,11 @@ export default {
         create: '创建'
       },
       rules: {
-        waiterNo: [
-          { required: true, message: '请填写工号', trigger: 'change' },
-          { min: 8, max: 8, message: '工号为8位', trigger: 'change' }
+        roomNo: [
+          { required: true, message: '请填写房间号', trigger: 'change' }
         ],
-        waiterName: [
-          { required: true, message: '请填写姓名', trigger: 'change' }
-        ],
-        waiterPassword: [
-          { required: true, message: '请填写密码', trigger: 'change' },
-          { required: true, min: 6, message: '密码至少为6位', trigger: 'change' }
-        ],
-        beginWorkTime: [
-          { required: true, message: '请指定上班时间', trigger: 'change' }
-        ],
-        endWorkTime: [
-          { required: true, message: '请指定下班时间', trigger: 'change' }
-        ],
-        workDay: [
-          { required: true, message: '请填写工作日', trigger: 'change' }
+        roomTypeName: [
+          { required: true, message: '请选择房间类型', trigger: 'change' }
         ]
       },
       downloadLoading: false
@@ -277,15 +216,18 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      getWaiters(this.listQuery).then(response => {
+      getRooms(this.listQuery).then(response => {
         this.tableData = response.data.items
         this.total = response.data.total
+      })
+      getTypes().then(response => {
+        this.roomTypeData = response.data
         this.listLoading = false
       })
     },
     sortChange(data) {
       const { prop, order } = data
-      if (prop === 'waiterId') {
+      if (prop === 'roomId') {
         this.sortByID(order)
       }
     },
@@ -299,14 +241,11 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        waiterId: 1,
-        waiterNo: '',
-        waiterName: '',
-        male: 1,
-        waiterPassword: '123456',
-        beginWorkTime: '06:00',
-        endWorkTime: '21:00',
-        workDay: '周一/周二/周三/周四/周五/周六/周日'
+        roomId: 1,
+        roomNo: '',
+        roomTypeName: '',
+        roomDetail: '',
+        empty: ''
       }
     },
     handleCreate() {
@@ -331,7 +270,7 @@ export default {
           this.dialogFormVisible = false
           return new Promise((resolve, reject) => {
             const tempData = Object.assign({}, this.temp)
-            createWaiterInfo(tempData).then(response => {
+            createRoomInfo(tempData).then(response => {
               const { data } = response
               if (data === true) {
                 this.tableData.unshift(this.temp)
@@ -347,7 +286,7 @@ export default {
                   message: '创建失败',
                   type: 'error'
                 })
-                reject('create waiter info failed')
+                reject('create room info failed')
               }
             }).catch(error => {
               reject(error)
@@ -362,11 +301,11 @@ export default {
           this.dialogFormVisible = false
           return new Promise((resolve, reject) => {
             const tempData = Object.assign({}, this.temp)
-            updateWaiterInfo(tempData).then(response => {
+            updateRoomInfo(tempData).then(response => {
               const { data } = response
               if (data === true) {
                 for (const v of this.tableData) {
-                  if (v.waiterId === this.temp.waiterId) {
+                  if (v.roomId === this.temp.roomId) {
                     const index = this.tableData.indexOf(v)
                     this.tableData.splice(index, 1, this.temp)
                     break
@@ -384,7 +323,7 @@ export default {
                   message: '更新失败',
                   type: 'error'
                 })
-                reject('update waiter info failed')
+                reject('update room info failed')
               }
             }).catch(error => {
               reject(error)
@@ -396,12 +335,12 @@ export default {
     deleteData(row) {
       this.temp = Object.assign({}, row)
       return new Promise((resolve, reject) => {
-        const { waiterId } = this.temp
-        deleteWaiterInfo(waiterId).then(response => {
+        const { roomId } = this.temp
+        deleteRoomInfo(roomId).then(response => {
           const { data } = response
           if (data === true) {
             for (const v of this.tableData) {
-              if (v.waiterId === waiterId) {
+              if (v.roomId === roomId) {
                 const index = this.tableData.indexOf(v)
                 this.tableData.splice(index, 1)
                 break
@@ -420,7 +359,7 @@ export default {
               message: '删除失败',
               type: 'error'
             })
-            reject('delete waiter info failed')
+            reject('delete room info failed')
           }
         }).catch(error => {
           reject(error)
@@ -430,21 +369,21 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['序号', '工号', '姓名', '性别', '密码', '上班时间', '下班时间', '工作日']
-          const filterVal = ['waiterId', 'waiterNo', 'waiterName', 'male', 'waiterPassword', 'beginWorkTime', 'endWorkTime', 'workDay']
+          const tHeader = ['序号', '房间号', '房间类型', '房间状态', '房间详情']
+          const filterVal = ['roomId', 'roomNo', 'roomTypeName', 'empty', 'roomDetail']
           const data = this.formatJson(filterVal, this.tableData)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: 'waiter-list'
+            filename: 'room-list'
           })
           this.downloadLoading = false
         })
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
-        if (j === 'male') {
-          return v[j] === 1 ? '男' : '女'
+        if (j === 'empty') {
+          return v[j] === 1 ? '房间空余' : '房间入住'
         } else {
           return v[j]
         }
@@ -454,14 +393,6 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-/deep/ .el-dialog{
-  display: flex;
-  flex-direction: column;
-  margin:0 !important;
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-}
+<style scoped>
+
 </style>
