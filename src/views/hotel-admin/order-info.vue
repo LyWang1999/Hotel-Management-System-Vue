@@ -247,7 +247,7 @@ export default {
       options: [],
       selectMaxRoomNum: 0,
       temp: {
-        orderId: 1,
+        orderId: '待定',
         registerPhone: '',
         roomTypeName: '',
         orderCreatedTime: '',

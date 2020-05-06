@@ -353,7 +353,7 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        checkCustomerId: 1,
+        checkCustomerId: '待定',
         checkCustomerIdCard: '',
         checkCustomerName: '',
         male: 1,

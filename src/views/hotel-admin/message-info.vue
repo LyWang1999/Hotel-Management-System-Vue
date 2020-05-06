@@ -1,35 +1,16 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.roomNo"
-        placeholder="房间号"
-        style="width: 150px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-input
-        v-model="listQuery.roomTypeName"
-        placeholder="房间类型"
-        style="width: 150px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-select
-        v-model="listQuery.empty"
-        placeholder="房间状态"
-        clearable
-        style="width: 150px"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      >
-        <el-option
-          v-for="(item, key) in roomStatus"
-          :key="key"
-          :label="item.label"
-          :value="item.value"
+      <div id="search-date-picker">
+        <el-date-picker
+          v-model="messageTimeInterval"
+          type="datetimerange"
+          start-placeholder="订单创建时间"
+          end-placeholder="订单创建时间"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          @keyup.enter.native="handleFilter"
         />
-      </el-select>
+      </div>
       <el-button
         class="filter-item"
         type="primary"
@@ -56,6 +37,11 @@
       >
         导出
       </el-button>
+      <el-switch
+        v-model="timelineVisible"
+        active-text="时间线视图"
+        style="float: right;margin-top: 10px"
+      />
     </div>
 
     <el-table
@@ -64,18 +50,18 @@
       fit
       border
       highlight-current-row
+      class="page-component__scroll el-scrollbar"
       @sort-change="sortChange"
     >
-      <el-table-column prop="roomId" label="序号" align="center" sortable="custom" width="90" />
-      <el-table-column prop="roomNo" label="房间号" align="center" width="100" />
-      <el-table-column prop="roomTypeName" label="房间类型" align="center" width="100" />
-      <el-table-column label="房间状态" align="center" width="100">
+      <el-table-column prop="messageId" label="序号" align="center" sortable="custom" width="90" />
+      <el-table-column prop="messageTitle" label="标题" align="center" width="200" />
+      <el-table-column prop="messageContent" label="内容" align="center" />
+      <el-table-column prop="messageSendTime" label="发送时间" align="center" sortable="custom" width="200">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.empty === 1">房间空余</el-tag>
-          <el-tag v-else type="info">房间入住</el-tag>
+          <i class="el-icon-time" />
+          <span>{{ scope.row.messageSendTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="roomDetail" label="房间详情" align="center" />
       <el-table-column label="操作" align="center" width="150">
         <template slot-scope="{row}">
           <el-button v-waves type="primary" size="mini" @click="handleUpdate(row)">
@@ -105,6 +91,24 @@
       @pagination="fetchData"
     />
 
+    <el-timeline v-show="timelineVisible">
+      <el-timeline-item v-for="(item, key) in tableData" :key="key" :timestamp="item.messageSendTime" placement="top">
+        <el-card>
+          <h4>{{ item.messageTitle }}</h4>
+          <p>{{ item.messageContent }}</p>
+        </el-card>
+      </el-timeline-item>
+    </el-timeline>
+
+    <el-tooltip placement="top" content="返回顶部">
+      <back-to-top
+        :custom-style="myBackToTopStyle"
+        :visibility-height="300"
+        :back-position="50"
+        transition-name="fade"
+      />
+    </el-tooltip>
+
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="37%">
       <el-form
         ref="dataForm"
@@ -114,26 +118,21 @@
         label-width="80px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item v-show="dialogStatus==='update'" label="序号" style="width: 71%">
-          <el-input :value="temp.roomId" :disabled="true" />
+        <el-form-item v-show="dialogStatus==='update'" label="序号">
+          <el-input :value="temp.messageId" :disabled="true" />
         </el-form-item>
-        <el-form-item label="房间号" prop="roomNo" style="width: 71%">
-          <el-input v-model="temp.roomNo" />
-        </el-form-item>
-        <el-form-item label="房间类型" prop="roomTypeName">
-          <el-select v-model="temp.roomTypeName">
-            <el-option v-for="(item, key) in roomTypeData" :key="key" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="房间状态" prop="empty" required>
-          <el-radio-group v-model="temp.empty">
-            <el-radio :label="1">房间空余</el-radio>
-            <el-radio :label="0">房间入住</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="房间详情" prop="roomDetail">
+        <el-form-item label="标题" prop="messageTitle">
           <el-input
-            v-model="temp.roomDetail"
+            v-model="temp.messageTitle"
+            type="textarea"
+            :rows="3"
+            maxlength="20"
+            show-word-limit
+          />
+        </el-form-item>
+        <el-form-item label="内容" prop="messageContent">
+          <el-input
+            v-model="temp.messageContent"
             type="textarea"
             :rows="4"
             maxlength="50"
@@ -154,13 +153,14 @@
 </template>
 
 <script>
-import { getRooms, updateRoomInfo, createRoomInfo, deleteRoomInfo } from '@/api/hotel-admin/room-info'
-import { getTypeNames } from '@/api/hotel-admin/room-type-info'
+import { getMessages, updateMessageInfo, createMessageInfo, deleteMessageInfo } from '@/api/hotel-admin/message-info'
+import { parseTime } from '@/utils'
+import BackToTop from '@/components/BackToTop'
 import Pagination from '@/components/Pagination/index'
 import waves from '@/directive/waves'
 
 export default {
-  components: { Pagination },
+  components: { Pagination, BackToTop },
   directives: { waves },
   data() {
     return {
@@ -170,71 +170,75 @@ export default {
         page: 1,
         limit: 10,
         asc: true,
-        roomNo: '',
-        roomTypeName: '',
-        empty: ''
+        beginDate: '',
+        endDate: '',
+        sortFiled: ''
       },
       tableData: [],
-      roomTypeData: [],
       temp: {
-        roomId: 1,
-        roomNo: '',
-        roomTypeName: '',
-        roomDetail: '',
-        empty: 1
+        messageId: 1,
+        messageTitle: '',
+        messageContent: '',
+        messageSendTime: ''
       },
-      roomStatus: [
-        {
-          label: '房间空余',
-          value: 1
-        },
-        {
-          label: '房间入住',
-          value: 0
-        }
-      ],
       dialogFormVisible: false,
+      timelineVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '创建'
       },
       rules: {
-        roomNo: [
-          { required: true, message: '请填写房间号', trigger: 'change' }
+        messageTitle: [
+          { required: true, message: '请填写标题', trigger: 'change' }
         ],
-        roomTypeName: [
-          { required: true, message: '请选择房间类型', trigger: 'change' }
+        messageContent: [
+          { required: true, message: '请填写内容', trigger: 'change' }
         ]
+      },
+      myBackToTopStyle: {
+        right: '50px',
+        bottom: '50px',
+        width: '40px',
+        height: '40px',
+        'border-radius': '4px',
+        'line-height': '45px', // 请保持与高度一致以垂直居中
+        background: '#e7eaf1'// 按钮的背景颜色
       },
       downloadLoading: false
     }
   },
+  computed: {
+    messageTimeInterval: {
+      get() {
+        return [this.listQuery.beginDate, this.listQuery.endDate]
+      },
+      set(value) {
+        if (value) {
+          this.listQuery.beginDate = value[0]
+          this.listQuery.endDate = value[1]
+        } else {
+          this.listQuery.beginDate = ''
+          this.listQuery.endDate = ''
+        }
+      }
+    }
+  },
   created() {
     this.fetchData()
-    this.fetchRoomTypeData()
   },
   methods: {
     fetchData() {
       this.listLoading = true
-      getRooms(this.listQuery).then(response => {
+      getMessages(this.listQuery).then(response => {
         this.tableData = response.data.items
         this.total = response.data.total
         this.listLoading = false
       })
     },
-    fetchRoomTypeData() {
-      getTypeNames().then(response => {
-        this.roomTypeData = response.data
-      })
-    },
     sortChange(data) {
       const { prop, order } = data
-      if (prop === 'roomId') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
+      this.listQuery.sortFiled = prop
       this.listQuery.asc = order === 'ascending'
       this.handleFilter()
     },
@@ -244,11 +248,10 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        roomId: '待定',
-        roomNo: '',
-        roomTypeName: '',
-        roomDetail: '',
-        empty: ''
+        messageId: '待定',
+        messageTitle: '',
+        messageContent: '',
+        messageSendTime: ''
       }
     },
     handleCreate() {
@@ -273,9 +276,10 @@ export default {
           this.dialogFormVisible = false
           return new Promise((resolve, reject) => {
             const tempData = Object.assign({}, this.temp)
-            createRoomInfo(tempData).then(response => {
+            createMessageInfo(tempData).then(response => {
               const { data } = response
               if (data === true) {
+                this.temp.messageSendTime = parseTime(new Date(), '{y}-{m}-{d} {h}:{i}:{s}')
                 this.tableData.unshift(this.temp)
                 this.$notify({
                   title: '成功',
@@ -289,7 +293,7 @@ export default {
                   message: '创建失败',
                   type: 'error'
                 })
-                reject('create room info failed')
+                reject('create message info failed')
               }
             }).catch(error => {
               reject(error)
@@ -304,11 +308,12 @@ export default {
           this.dialogFormVisible = false
           return new Promise((resolve, reject) => {
             const tempData = Object.assign({}, this.temp)
-            updateRoomInfo(tempData).then(response => {
+            updateMessageInfo(tempData).then(response => {
               const { data } = response
               if (data === true) {
+                this.temp.messageSendTime = parseTime(new Date(), '{y}-{m}-{d} {h}:{i}:{s}')
                 for (const v of this.tableData) {
-                  if (v.roomId === this.temp.roomId) {
+                  if (v.messageId === this.temp.messageId) {
                     const index = this.tableData.indexOf(v)
                     this.tableData.splice(index, 1, this.temp)
                     break
@@ -326,7 +331,7 @@ export default {
                   message: '更新失败',
                   type: 'error'
                 })
-                reject('update room info failed')
+                reject('update message info failed')
               }
             }).catch(error => {
               reject(error)
@@ -338,12 +343,12 @@ export default {
     deleteData(row) {
       this.temp = Object.assign({}, row)
       return new Promise((resolve, reject) => {
-        const { roomId } = this.temp
-        deleteRoomInfo(roomId).then(response => {
+        const { messageId } = this.temp
+        deleteMessageInfo(messageId).then(response => {
           const { data } = response
           if (data === true) {
             for (const v of this.tableData) {
-              if (v.roomId === roomId) {
+              if (v.messageId === messageId) {
                 const index = this.tableData.indexOf(v)
                 this.tableData.splice(index, 1)
                 break
@@ -362,7 +367,7 @@ export default {
               message: '删除失败',
               type: 'error'
             })
-            reject('delete room info failed')
+            reject('delete message info failed')
           }
         }).catch(error => {
           reject(error)
@@ -372,30 +377,30 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['序号', '房间号', '房间类型', '房间状态', '房间详情']
-          const filterVal = ['roomId', 'roomNo', 'roomTypeName', 'empty', 'roomDetail']
+          const tHeader = ['序号', '标题', '内容', '发送时间']
+          const filterVal = ['messageId', 'messageTitle', 'messageContent', 'messageSendTime']
           const data = this.formatJson(filterVal, this.tableData)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: 'room-list'
+            filename: 'message-list'
           })
           this.downloadLoading = false
         })
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
-        if (j === 'empty') {
-          return v[j] === 1 ? '房间空余' : '房间入住'
-        } else {
-          return v[j]
-        }
+        return v[j]
       }))
     }
   }
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+#search-date-picker {
+  margin-bottom:10px;
+  display: inline-block;
+  vertical-align: middle;
+}
 </style>

@@ -268,7 +268,7 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        registerId: 1,
+        registerId: '待定',
         registerPhone: '',
         registerAccount: '',
         registerPassword: '123456',

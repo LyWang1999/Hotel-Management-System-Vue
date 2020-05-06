@@ -124,6 +124,21 @@ export const asyncRoutes = [
         meta: { title: '房型信息' }
       }
     ]
+  },
+  {
+    path: '/admin/message_root',
+    name: 'message_root',
+    redirect: 'noRedirect',
+    component: Layout,
+    meta: { title: '公告信息', icon: 'message', roles: ['admin'] },
+    children: [
+      {
+        path: 'message_info',
+        name: 'message_info',
+        component: () => import('@/views/hotel-admin/message-info'),
+        meta: { title: '公告信息' }
+      }
+    ]
   }
 ]
 

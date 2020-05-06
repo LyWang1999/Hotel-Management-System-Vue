@@ -299,7 +299,7 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        waiterId: 1,
+        waiterId: '待定',
         waiterNo: '',
         waiterName: '',
         male: 1,

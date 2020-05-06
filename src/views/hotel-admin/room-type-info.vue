@@ -207,7 +207,7 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        roomTypeId: 1,
+        roomTypeId: '待定',
         roomNo: '',
         roomTypeName: '',
         roomDetail: '',
