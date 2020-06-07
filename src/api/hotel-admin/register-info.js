@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getRegisterNum() {
+  return request({
+    url: '/register/num',
+    method: 'get'
+  })
+}
+
 export function getOneRegisterByPhone(registerPhone) {
   return request({
     url: '/register/info/phone/' + registerPhone,

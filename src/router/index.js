@@ -46,13 +46,24 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: {
-        title: '首页', icon: 'dashboard' }
-    }]
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index'),
+        meta: {
+          title: '首页', icon: 'dashboard' }
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        hidden: true,
+        component: () => import('@/views/profile'),
+        meta: {
+          title: '个人信息'
+        }
+      }
+    ]
   },
 
   // 404 page must be placed at the end !!!

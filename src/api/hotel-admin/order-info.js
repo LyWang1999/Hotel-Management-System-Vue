@@ -1,5 +1,19 @@
 import request from '@/utils/request'
 
+export function getOrderNum() {
+  return request({
+    url: '/order/num',
+    method: 'get'
+  })
+}
+
+export function getOrderPriceSum() {
+  return request({
+    url: '/order/price-sum',
+    method: 'get'
+  })
+}
+
 export function getOrders(listQuery) {
   return request({
     url: '/order/info/page/' + listQuery.page + '/limit/' + listQuery.limit + '/asc/' + listQuery.asc,

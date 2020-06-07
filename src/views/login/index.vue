@@ -64,14 +64,14 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (value.length !== 8) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('工号的长度为8位'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value === null || value.length === 0) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码的长度最少为6位'))
       } else {
         callback()
       }
@@ -149,7 +149,7 @@ export default {
         if (valid) {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+            this.$router.push({ path: this.redirect || '/dashboard' })
             this.loading = false
           }).catch(() => {
             this.loading = false

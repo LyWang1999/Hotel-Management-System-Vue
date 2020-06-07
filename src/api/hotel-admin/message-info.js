@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 import { parseTime } from '@/utils'
 
+export function getMessageNum() {
+  return request({
+    url: '/message/num',
+    method: 'get'
+  })
+}
+
 export function getMessages(listQuery) {
   return request({
     url: '/message/info/page/' + listQuery.page + '/limit/' + listQuery.limit + '/asc/' + listQuery.asc,
